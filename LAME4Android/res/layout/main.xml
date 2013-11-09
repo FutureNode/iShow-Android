@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <Button
+        android:id="@+id/camera_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="Click to take a photo" />
+
+    <ImageView
+        android:id="@+id/photo"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="#ff0000"
+        android:scaleType="centerCrop"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/select_bgmusic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="Select background music type"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/recorder_audio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="Record audio" />
+
+    <Button
+        android:id="@+id/recorder_video"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="Record video" />
+
+</LinearLayout>
