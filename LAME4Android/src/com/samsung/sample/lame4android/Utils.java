@@ -4,8 +4,8 @@ package com.samsung.sample.lame4android;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -14,6 +14,7 @@ import android.util.Log;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.CookieStore;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.mime.MultipartEntity;
@@ -23,16 +24,18 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -57,16 +60,34 @@ public class Utils {
     public static final String WEBSITE = "http://211.78.254.238/";
     public static final String WEBSITE_RECORD = WEBSITE + "record";
     public static final String WEBSITE_IMAGE = WEBSITE + "image";
+    public static final String WEBSITE_TEXT = WEBSITE + "text";
     public static final String WEBSITE_VIDEO = WEBSITE + "video";
     public static final String WEBSITE_LOGIN = WEBSITE + "login/";
     public static final String WEBSITE_PROGRAM = WEBSITE + "program";
-    public static final String WEBSITE_MUSIC = WEBSITE + "json/music.json";
+    public static final String WEBSITE_MUSIC_JSON = WEBSITE + "json/music.json";
+    public static final String WEBSITE_MUSIC = WEBSITE + "music";
+    public static final String WEBSITE_TRACK = WEBSITE + "track/";
 
     public static final String KEY_PROGRAM_ID = "programId";
+    public static final String KEY_MUSIC_ID = "musicId";
     public static final String KEY_FILE = "file";
+    public static final String KEY_NAME = "name";
+    public static final String KEY_ID = "id";
+    public static final String KEY_TEXT_ID = "text";
 
     public static Cookie sCookie;
-    public static String sId;
+    public static String sProgramId;
+
+    public static Uri sPhotoUri;
+    public static String sText;
+    public static Data sData;
+    public static String sHeroName;
+    public static String sLifeId;
+
+    public static MediaPlayer sMediaPlayer = new MediaPlayer();
+
+    public static final String[] MOOD = new String[] { "happy", "sad", "laugh", "silent", "shit",
+            "bad", "flower" };
 
     private static DefaultHttpClient getCookiedHttpClient() {
         DefaultHttpClient httpclient = new DefaultHttpClient();
@@ -76,48 +97,41 @@ public class Utils {
         return httpclient;
     }
 
-    public static void getMusicList() {
+    public static Uri getMusicUri(String lifeId) {
+        return Uri.parse(WEBSITE_TRACK + lifeId);
+    }
 
-        new AsyncTask<Void, Void, Void>() {
+    public static List<Data> getMusicList() {
 
-            @Override
-            protected Void doInBackground(Void... params) {
-                DefaultHttpClient httpclient = getCookiedHttpClient();
+        DefaultHttpClient httpclient = getCookiedHttpClient();
 
-                HttpPost post = new HttpPost(WEBSITE_MUSIC);
-                HttpContext localContext = new BasicHttpContext();
-                try {
-                    HttpResponse response = httpclient.execute(post, localContext);
-                    HttpEntity entity = response.getEntity();
-                    if (entity == null) {
-                        Log.d(TAG, "entity = null");
-                    } else {
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(
-                                entity.getContent(), "UTF-8"));
-                        StringBuilder strB = new StringBuilder();
-                        String str;
-                        while ((str = reader.readLine()) != null) {
-                            Log.i(TAG, "sResponse = " + str);
-                            strB.append(str);
-                        }
-                        //                        JSONObject jObj = new JSONObject(strB.toString()).getJSONObject("program");
-                        //                        strB.delete(0, strB.length() - 1);
-                        //                        sId = jObj.getString("_id");
-                        //                        Log.i(TAG, "sId = " + sId);
-                    }
-                } catch (Exception e) {
-                    Log.i(TAG, e.toString());
-                    e.printStackTrace();
-                }
-                httpclient.getConnectionManager().shutdown();
-                return null;
+        HttpGet httpGet = new HttpGet(WEBSITE_MUSIC_JSON);
+        try {
+            HttpResponse response = httpclient.execute(httpGet);
+            String result = EntityUtils.toString(response.getEntity(), "UTF-8");
+            Log.d(TAG, "result = " + result);
+            JSONObject resultJson = new JSONObject(result);
+            Log.d(TAG, "resultJson = " + resultJson);
+            JSONArray jArray = resultJson.getJSONArray("data");
+            List<Data> dataList = new ArrayList<Data>();
+            JSONObject jObj;
+            for (int i = 0; i < jArray.length(); i++) {
+                jObj = jArray.getJSONObject(i);
+                Data data = new Data();
+                dataList.add(data);
+                data.name = jObj.getString(KEY_NAME);
+                data.musicId = jObj.getString(KEY_ID);
+                Log.i(TAG, "data.name = " + data.name);
             }
 
-            @Override
-            protected void onPostExecute(Void result) {
-                super.onPostExecute(result);
-            }
-        }.execute();
+            httpclient.getConnectionManager().shutdown();
+            return dataList;
+        } catch (Exception e) {
+            Log.i(TAG, e.toString());
+            e.printStackTrace();
+        }
+        httpclient.getConnectionManager().shutdown();
+        return null;
     }
 
     public static void addProgram(final Activity activity) {
@@ -133,8 +147,7 @@ public class Utils {
             @Override
             protected void onPostExecute(Void result) {
                 super.onPostExecute(result);
-                Intent intent = new Intent(activity.getApplicationContext(),
-                        FutureNodeActivity.class);
+                Intent intent = new Intent(activity.getApplicationContext(), PhotoActivity.class);
                 activity.startActivity(intent);
                 activity.finish();
             }
@@ -164,8 +177,8 @@ public class Utils {
                 }
                 JSONObject jObj = new JSONObject(strB.toString()).getJSONObject("program");
                 strB.delete(0, strB.length() - 1);
-                sId = jObj.getString("_id");
-                Log.i(TAG, "sId = " + sId);
+                sProgramId = jObj.getString("_id");
+                Log.i(TAG, "sId = " + sProgramId);
             }
         } catch (Exception e) {
             Log.i(TAG, e.toString());
@@ -231,7 +244,42 @@ public class Utils {
         }
     }
 
-    public static void uploadFile(final Uri uri, final String action) {
+    public static void uploadData(final String key, final String value, final String action) {
+
+        new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... params) {
+
+                Log.i(TAG, "start uploadData value " + value);
+                DefaultHttpClient httpclient = getCookiedHttpClient();
+
+                HttpPost post = new HttpPost(action);
+                HttpContext localContext = new BasicHttpContext();
+                try {
+                    MultipartEntity multiEntity = new MultipartEntity();
+                    multiEntity.addPart(KEY_PROGRAM_ID, new StringBody(sProgramId));
+                    multiEntity.addPart(key, new StringBody(value));
+                    post.setEntity(multiEntity);
+
+                    HttpResponse response = httpclient.execute(post, localContext);
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(response
+                            .getEntity().getContent(), "UTF-8"));
+
+                    String sResponse;
+                    while ((sResponse = reader.readLine()) != null) {
+                        Log.i(TAG, "sResponse = " + sResponse);
+                    }
+                } catch (Exception e) {
+                    Log.i(TAG, e.toString());
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        }.execute();
+    }
+
+    public static void uploadFile(Uri uri, String action) {
         uploadFile(new File(uri.getPath()), action);
     }
 
@@ -251,11 +299,11 @@ public class Utils {
                 try {
                     MultipartEntity multiEntity = new MultipartEntity();
                     FileBody fileBody = new FileBody(file);
-                    multiEntity.addPart(KEY_PROGRAM_ID, new StringBody(sId));
+                    multiEntity.addPart(KEY_PROGRAM_ID, new StringBody(sProgramId));
                     multiEntity.addPart(KEY_FILE, fileBody);
                     post.setEntity(multiEntity);
 
-                    HttpResponse response = httpclient.execute(post, localContext);
+                    HttpResponse response = httpclient.execute(post);
                     BufferedReader reader = new BufferedReader(new InputStreamReader(response
                             .getEntity().getContent(), "UTF-8"));
 

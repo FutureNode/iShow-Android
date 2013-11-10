@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
 
     <ImageView
         android:id="@+id/mood"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_centerVertical="true"
-        android:scaleType="center" />
+        android:scaleType="fitCenter"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/type"
@@ -17,7 +18,7 @@
         android:layout_centerVertical="true"
         android:layout_toRightOf="@+id/mood"
         android:padding="12dp"
-        android:text="adf"
+        android:textColor="@android:color/black"
         android:textSize="18dp" />
 
 </RelativeLayout>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <Button
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:text="Step2. Say something" />
+
+    <Button
+        android:id="@+id/next"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="Next" />
+
+    <EditText
+        android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/next"
+        android:layout_below="@id/title"
+        android:background="#dddddd"
+        android:gravity="top"
+        android:hint="創造你的舞台 按照你的節奏\n生活就是最美的創作\n找出你的舞台 創造你的節奏\n美好生活 LifeShow"
+        android:padding="10dp"
+        android:textSize="20dp" />
+
+</RelativeLayout>

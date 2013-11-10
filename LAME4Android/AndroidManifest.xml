@@ -31,6 +31,14 @@
         </activity>
         <activity android:name=".LoginActivity" >
         </activity>
+        <activity android:name=".PhotoActivity" >
+        </activity>
+        <activity android:name=".TextActivity" >
+        </activity>
+        <activity android:name=".CreativeActivity" >
+        </activity>
+        <activity android:name=".RecorderActivity" >
+        </activity>
         <activity android:name=".AddProgramActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

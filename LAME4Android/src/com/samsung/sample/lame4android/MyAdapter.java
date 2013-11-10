@@ -11,8 +11,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.samsung.sample.lame4android.SelectBGMusicActivity.Data;
-
 import java.util.List;
 
 public class MyAdapter extends ArrayAdapter<Data> {
@@ -25,9 +23,9 @@ public class MyAdapter extends ArrayAdapter<Data> {
 
     public MyAdapter(Context context, int resource, int textViewResourceId, List<Data> objects) {
         super(context, resource, textViewResourceId, objects);
-        mMoodOriginBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.mood);
-        mBitmapWidth = mMoodOriginBitmap.getWidth() / mMoodCount;
-        mBitmapHeight = mMoodOriginBitmap.getHeight();
+        //        mMoodOriginBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.mood);
+        //        mBitmapWidth = mMoodOriginBitmap.getWidth() / mMoodCount;
+        //        mBitmapHeight = mMoodOriginBitmap.getHeight();
     }
 
     @Override
@@ -47,11 +45,11 @@ public class MyAdapter extends ArrayAdapter<Data> {
         Holder holder = (Holder)view.getTag();
         if (holder == null) {
             holder = new Holder();
-            holder.imageView = (ImageView)view.findViewById(R.id.mood);
+            //            holder.imageView = (ImageView)view.findViewById(R.id.mood);
             holder.textView = (TextView)view.findViewById(R.id.type);
         }
-        holder.imageView.setImageBitmap(getBitmap(position));
-        holder.textView.setText(getItem(position).type);
+        //        holder.imageView.setImageBitmap(getBitmap(position));
+        holder.textView.setText(getItem(position).name);
         view.setTag(holder);
     }
 

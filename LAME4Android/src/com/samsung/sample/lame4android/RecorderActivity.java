@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.text.format.Time;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -26,9 +25,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class LameActivity extends Activity {
+public class RecorderActivity extends Activity {
 
-    public static final String TAG = "FutureNode_LameActivity";
+    public static final String TAG = "FutureNode_FutureNodeActivity";
 
     static {
         System.loadLibrary("mp3lame");
@@ -62,7 +61,7 @@ public class LameActivity extends Activity {
     private ImageView mRedImageView;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.record);
 
@@ -75,12 +74,9 @@ public class LameActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                Utils.uploadFile(Uri.fromFile(mEncodedFile), Utils.WEBSITE_RECORD);
-//                Utils.uploadData(Utils.KEY_TEXT_ID, Utils.sText, Utils.WEBSITE_TEXT);
-//                Intent intent = new Intent(getApplicationContext(), CreativeActivity.class);
-//                startActivity(intent);
-                Toast.makeText(LameActivity.this, "Upload " + mEncodedFile.getName(),
-                        Toast.LENGTH_SHORT).show();
+                //                Utils.uploadData(Utils.KEY_TEXT_ID, Utils.sText, Utils.WEBSITE_TEXT);
+                //                Intent intent = new Intent(getApplicationContext(), CreativeActivity.class);
+                //                startActivity(intent);
             }
         });
 
@@ -96,8 +92,6 @@ public class LameActivity extends Activity {
                     mRecorder.startRecording();
                     mRawFile = getFile("raw");
                     startBufferedWrite(mRawFile);
-
-                    playAudio();
                 } else {
                     mRedImageView.setVisibility(View.GONE);
                     mIsRecording = false;
@@ -108,7 +102,13 @@ public class LameActivity extends Activity {
                     if (result == 0) {
                         String imagePath = mEncodedFile.getAbsolutePath();
                         Log.d(TAG, "file path = " + imagePath);
-                        mMediaPlayer.stop();
+                        Toast.makeText(RecorderActivity.this,
+                                "Encoded to " + mEncodedFile.getName(), Toast.LENGTH_SHORT).show();
+                        Utils.uploadFile(Uri.fromFile(mEncodedFile), Utils.WEBSITE_RECORD);
+                        Intent data = new Intent();
+                        data.setData(Uri.fromFile(mEncodedFile));
+                        setResult(RESULT_OK, data);
+                        finish();
                     }
                 }
             }
@@ -118,43 +118,6 @@ public class LameActivity extends Activity {
         if (Utils.sPhotoUri != null) {
             mPhotoImageView.setImageURI(Utils.sPhotoUri);
         }
-
-    }
-
-    private void playAudio() {
-        try {
-            mMediaPlayer.seekTo(0);
-            mMediaPlayer.start();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void playAudio(Uri uri) {
-        try {
-            mMediaPlayer.reset();
-            mMediaPlayer.setDataSource(getApplicationContext(), uri);
-            mMediaPlayer.prepare();
-            mMediaPlayer.start();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_lame, menu);
-        return true;
     }
 
     @Override
@@ -187,19 +150,20 @@ public class LameActivity extends Activity {
                         }
                     }
                 } catch (IOException e) {
-                    Toast.makeText(LameActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RecorderActivity.this, e.getMessage(), Toast.LENGTH_SHORT)
+                            .show();
                 } finally {
                     if (output != null) {
                         try {
                             output.flush();
                         } catch (IOException e) {
-                            Toast.makeText(LameActivity.this, e.getMessage(), Toast.LENGTH_SHORT)
-                                    .show();
+                            Toast.makeText(RecorderActivity.this, e.getMessage(),
+                                    Toast.LENGTH_SHORT).show();
                         } finally {
                             try {
                                 output.close();
                             } catch (IOException e) {
-                                Toast.makeText(LameActivity.this, e.getMessage(),
+                                Toast.makeText(RecorderActivity.this, e.getMessage(),
                                         Toast.LENGTH_SHORT).show();
                             }
                         }
@@ -215,4 +179,22 @@ public class LameActivity extends Activity {
         return new File(Environment.getExternalStorageDirectory() + "/FutureNode",
                 time.format("%Y%m%d%H%M%S") + "." + suffix);
     }
+
+    private void playAudio(Uri uri) {
+        try {
+            mMediaPlayer.reset();
+            mMediaPlayer.setDataSource(getApplicationContext(), uri);
+            mMediaPlayer.prepare();
+            mMediaPlayer.start();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
