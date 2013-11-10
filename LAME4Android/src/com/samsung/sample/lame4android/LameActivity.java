@@ -17,25 +17,11 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.samsung.sample.lame4android.R;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.HttpContext;
-
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 public class LameActivity extends Activity {
 
@@ -97,23 +83,13 @@ public class LameActivity extends Activity {
                         Log.d(TAG, "file path = " + imagePath);
                         Toast.makeText(LameActivity.this, "Encoded to " + mEncodedFile.getName(),
                                 Toast.LENGTH_SHORT).show();
-                        //                                                Utils.uploadFile(mEncodedFile,Utils.FILE_TYPE_AUDIO);
+                        Utils.uploadFile(Uri.fromFile(mEncodedFile), Utils.WEBSITE_RECORD);
                         Intent data = new Intent();
                         data.setData(Uri.fromFile(mEncodedFile));
                         setResult(RESULT_OK, data);
                         finish();
                     }
                 }
-            }
-        });
-
-        Button updateButton = (Button)findViewById(R.id.upload);
-        updateButton.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                //                Utils.uploadFile(new File("/storage/sdcard0/DCIM/doule_j0_.jpg"));
             }
         });
     }

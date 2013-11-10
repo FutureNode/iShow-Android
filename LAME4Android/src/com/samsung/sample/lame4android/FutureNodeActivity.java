@@ -3,6 +3,9 @@ package com.samsung.sample.lame4android;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,9 +15,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.MediaController;
+import android.widget.VideoView;
 
-import com.samsung.sample.lame4android.R;
-
+import java.io.File;
 import java.io.IOException;
 
 public class FutureNodeActivity extends Activity {
@@ -26,6 +30,7 @@ public class FutureNodeActivity extends Activity {
     private Button mSelectBGMusicButton;
     private Button mRecordAudioButton;
     private Button mRecordVideoButton;
+    private VideoView mVideoView;
 
     private Uri mPhotoUri;
 
@@ -40,10 +45,19 @@ public class FutureNodeActivity extends Activity {
         mSelectBGMusicButton.setOnClickListener(mSelectBGMusicOnClickListener);
         mRecordAudioButton = (Button)findViewById(R.id.recorder_audio);
         mRecordAudioButton.setOnClickListener(mRecordAudioOnClickListener);
-        mRecordVideoButton = (Button)findViewById(R.id.recorder_audio);
-        mRecordVideoButton.setOnClickListener(mRecordAudioOnClickListener);
+        mRecordVideoButton = (Button)findViewById(R.id.recorder_video);
+        mRecordVideoButton.setOnClickListener(mRecordVideoOnClickListener);
+        mVideoView = (VideoView)findViewById(R.id.videoview);
     }
 
+    private OnClickListener mRecordVideoOnClickListener = new OnClickListener() {
+
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(getApplicationContext(), RecordVideoActivity.class);
+            startActivityForResult(intent, Utils.RECORD_VIDEO_ACTIVITY_REQUEST_CODE);
+        }
+    };
     private OnClickListener mRecordAudioOnClickListener = new OnClickListener() {
 
         @Override
@@ -56,7 +70,8 @@ public class FutureNodeActivity extends Activity {
 
         @Override
         public void onClick(View v) {
-
+            Intent intent = new Intent(getApplicationContext(), SelectBGMusicActivity.class);
+            startActivityForResult(intent, Utils.SELECT_ACTIVITY_REQUEST_CODE);
         }
     };
 
@@ -89,28 +104,45 @@ public class FutureNodeActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             if (requestCode == Utils.CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE) {
+                Uri thumbanilUri = Utils.getThumbnailUri(mPhotoUri);
+                Log.d(TAG, "thumbanilUri = " + thumbanilUri.toString());
+                Utils.uploadFile(thumbanilUri, Utils.WEBSITE_IMAGE);
                 mCameraButton.setVisibility(View.GONE);
                 mRecordAudioButton.setVisibility(View.VISIBLE);
                 mRecordVideoButton.setVisibility(View.VISIBLE);
                 mPhotoImageView.setVisibility(View.VISIBLE);
-                mPhotoImageView.setImageURI(mPhotoUri);
+                mPhotoImageView.setImageURI(thumbanilUri);
             } else if (requestCode == Utils.RECORD_AUDIO_ACTIVITY_REQUEST_CODE) {
-                MediaPlayer mediaPlayer = new MediaPlayer();
-                try {
-                    mediaPlayer.reset();
-                    mediaPlayer.setDataSource(getApplicationContext(), data.getData());
-                    mediaPlayer.prepare();
-                    mediaPlayer.start();
-                } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
-                } catch (SecurityException e) {
-                    e.printStackTrace();
-                } catch (IllegalStateException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                playVideo(data.getData());
+                //                playAudio(data.getData());
+            } else if (requestCode == Utils.RECORD_VIDEO_ACTIVITY_REQUEST_CODE) {
+                playVideo(data.getData());
             }
+        }
+    }
+
+    private void playVideo(Uri uri) {
+        mVideoView.setMediaController(new MediaController(this));
+        mVideoView.setVideoURI(uri);
+        mVideoView.start();
+        mVideoView.requestFocus();
+    }
+
+    private void playAudio(Uri uri) {
+        MediaPlayer mediaPlayer = new MediaPlayer();
+        try {
+            mediaPlayer.reset();
+            mediaPlayer.setDataSource(getApplicationContext(), uri);
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

@@ -26,8 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
-        android:text="Select background music type"
-        android:visibility="gone" />
+        android:text="Select background music type" />
 
     <Button
         android:id="@+id/recorder_audio"
@@ -44,5 +43,11 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:text="Record video" />
+
+    <VideoView
+        android:id="@+id/videoview"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:gravity="center" />
 
 </LinearLayout>

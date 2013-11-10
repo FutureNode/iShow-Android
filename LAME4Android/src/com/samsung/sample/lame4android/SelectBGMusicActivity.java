@@ -2,29 +2,46 @@
 package com.samsung.sample.lame4android;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.hardware.Camera;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.ListView;
 
-import java.io.IOException;
+import java.util.ArrayList;
 
 public class SelectBGMusicActivity extends Activity {
 
     public static final String TAG = "FutureNode_SelectBGMusicActivity";
 
+    private ListView mListView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.select_bgmusic);
 
+        ArrayList<Data> datas = new ArrayList<Data>();
+        Data data = new Data();
+        data.type = "Classic";
+        datas.add(data);
+        data = new Data();
+        data.type = "Jazz";
+        datas.add(data);
+        data = new Data();
+        data.type = "Blue Jazz";
+        datas.add(data);
+        data = new Data();
+        data.type = "Basanova";
+        datas.add(data);
+        MyAdapter adapter = new MyAdapter(getApplicationContext(), R.id.listview,
+                R.layout.activity_lame, datas);
+
+        mListView = (ListView)findViewById(R.id.listview);
+        mListView.setAdapter(adapter);
+        
+        Utils.getMusicList();
+    }
+
+    public class Data {
+        String type;
     }
 
 }
